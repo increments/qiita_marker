@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'test_helper'
+require "test_helper"
 
 module QiitaMarker
   class TestMaliciousness < Minitest::Test
     def setup
-      @doc = QiitaMarker.render_doc('Hi *there*')
+      @doc = QiitaMarker.render_doc("Hi *there*")
     end
 
     def test_init_with_bad_type
@@ -52,7 +52,7 @@ module QiitaMarker
       end
 
       assert_raises TypeError do
-        QiitaMarker.render_html("foo \n baz", [:SMART, 'totes_fake'])
+        QiitaMarker.render_html("foo \n baz", [:SMART, "totes_fake"])
       end
 
       assert_raises TypeError do
@@ -74,7 +74,7 @@ module QiitaMarker
       err = assert_raises TypeError do
         QiitaMarker.render_doc("foo \n baz", :safe)
       end
-      assert_equal('option \':safe\' does not exist for QiitaMarker::Config::OPTS[:parse]', err.message)
+      assert_equal("option ':safe' does not exist for QiitaMarker::Config::OPTS[:parse]", err.message)
 
       assert_raises TypeError do
         QiitaMarker.render_doc("foo \n baz", :totes_fake)
@@ -93,7 +93,7 @@ module QiitaMarker
       end
 
       assert_raises TypeError do
-        QiitaMarker.render_doc("foo \n baz", [:SMART, 'totes_fake'])
+        QiitaMarker.render_doc("foo \n baz", [:SMART, "totes_fake"])
       end
 
       assert_raises TypeError do
@@ -149,10 +149,10 @@ module QiitaMarker
 
     def test_bad_url_set
       assert_raises NodeError do
-        @doc.url = '123'
+        @doc.url = "123"
       end
 
-      link = QiitaMarker.render_doc('[GitHub](https://www.github.com)').first_child.first_child
+      link = QiitaMarker.render_doc("[GitHub](https://www.github.com)").first_child.first_child
       assert_raises TypeError do
         link.url = 123
       end
@@ -166,7 +166,7 @@ module QiitaMarker
 
     def test_bad_title_set
       assert_raises NodeError do
-        @doc.title = '123'
+        @doc.title = "123"
       end
 
       image = QiitaMarker.render_doc('![alt text](https://github.com/favicon.ico "Favicon")')
@@ -187,9 +187,9 @@ module QiitaMarker
         @doc.header_level = 1
       end
 
-      header = QiitaMarker.render_doc('### Header Three').first_child
+      header = QiitaMarker.render_doc("### Header Three").first_child
       assert_raises TypeError do
-        header.header_level = '123'
+        header.header_level = "123"
       end
     end
 
@@ -250,7 +250,7 @@ module QiitaMarker
 
     def test_bad_fence_info_set
       assert_raises NodeError do
-        @doc.fence_info = 'ruby'
+        @doc.fence_info = "ruby"
       end
 
       fence = QiitaMarker.render_doc("``` ruby\nputs 'wow'\n```").first_child

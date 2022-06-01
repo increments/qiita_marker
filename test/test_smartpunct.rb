@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'test_helper'
+require "test_helper"
 
 class SmartPunctTest < Minitest::Test
-  smart_punct = open_spec_file('smart_punct.txt')
+  smart_punct = open_spec_file("smart_punct.txt")
 
   smart_punct.each do |testcase|
     doc = QiitaMarker.render_doc(testcase[:markdown], :SMART)

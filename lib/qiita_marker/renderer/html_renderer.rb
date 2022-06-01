@@ -9,8 +9,8 @@ module QiitaMarker
 
     def header(node)
       block do
-        out('<h', node.header_level, "#{sourcepos(node)}>", :children,
-            '</h', node.header_level, '>')
+        out("<h", node.header_level, "#{sourcepos(node)}>", :children,
+            "</h", node.header_level, ">")
       end
     end
 
@@ -19,10 +19,10 @@ module QiitaMarker
         out(:children)
       else
         block do
-          container("<p#{sourcepos(node)}>", '</p>') do
+          container("<p#{sourcepos(node)}>", "</p>") do
             out(:children)
             if node.parent.type == :footnote_definition && node.next.nil?
-              out(' ')
+              out(" ")
               out_footnote_backref
             end
           end
@@ -36,7 +36,7 @@ module QiitaMarker
 
       block do
         if node.list_type == :bullet_list
-          container("<ul#{sourcepos(node)}>\n", '</ul>') do
+          container("<ul#{sourcepos(node)}>\n", "</ul>") do
             out(:children)
           end
         else
@@ -45,7 +45,7 @@ module QiitaMarker
                   else
                     "<ol start=\"#{node.list_start}\"#{sourcepos(node)}>\n"
                   end
-          container(start, '</ol>') do
+          container(start, "</ol>") do
             out(:children)
           end
         end
@@ -57,14 +57,14 @@ module QiitaMarker
     def list_item(node)
       block do
         tasklist_data = tasklist(node)
-        container("<li#{sourcepos(node)}#{tasklist_data}>#{' ' if tasklist?(node)}", '</li>') do
+        container("<li#{sourcepos(node)}#{tasklist_data}>#{' ' if tasklist?(node)}", "</li>") do
           out(:children)
         end
       end
     end
 
     def tasklist(node)
-      return '' unless tasklist?(node)
+      return "" unless tasklist?(node)
 
       state = if checked?(node)
                 'checked="" disabled=""'
@@ -76,7 +76,7 @@ module QiitaMarker
 
     def blockquote(node)
       block do
-        container("<blockquote#{sourcepos(node)}>\n", '</blockquote>') do
+        container("<blockquote#{sourcepos(node)}>\n", "</blockquote>") do
           out(:children)
         end
       end
@@ -93,21 +93,21 @@ module QiitaMarker
         if option_enabled?(:GITHUB_PRE_LANG)
           out("<pre#{sourcepos(node)}")
           out(' lang="', node.fence_info.split(/\s+/)[0], '"') if node.fence_info && !node.fence_info.empty?
-          out('><code>')
+          out("><code>")
         elsif option_enabled?(:CODE_DATA_METADATA)
           out("<pre#{sourcepos(node)}><code")
           out(' data-metadata="', node.fence_info, '"') if node.fence_info && !node.fence_info.empty?
-          out('>')
+          out(">")
         else
           out("<pre#{sourcepos(node)}><code")
           if node.fence_info && !node.fence_info.empty?
             out(' class="language-', node.fence_info.split(/\s+/)[0], '">')
           else
-            out('>')
+            out(">")
           end
         end
         out(escape_html(node.string_content))
-        out('</code></pre>')
+        out("</code></pre>")
       end
     end
 
@@ -116,7 +116,7 @@ module QiitaMarker
         if option_enabled?(:UNSAFE)
           out(tagfilter(node.string_content))
         else
-          out('<!-- raw HTML omitted -->')
+          out("<!-- raw HTML omitted -->")
         end
       end
     end
@@ -125,22 +125,22 @@ module QiitaMarker
       if option_enabled?(:UNSAFE)
         out(tagfilter(node.string_content))
       else
-        out('<!-- raw HTML omitted -->')
+        out("<!-- raw HTML omitted -->")
       end
     end
 
     def emph(_)
-      out('<em>', :children, '</em>')
+      out("<em>", :children, "</em>")
     end
 
     def strong(_)
-      out('<strong>', :children, '</strong>')
+      out("<strong>", :children, "</strong>")
     end
 
     def link(node)
-      out('<a href="', node.url.nil? ? '' : escape_href(node.url), '"')
+      out('<a href="', node.url.nil? ? "" : escape_href(node.url), '"')
       out(' title="', escape_html(node.title), '"') if node.title && !node.title.empty?
-      out('>', :children, '</a>')
+      out(">", :children, "</a>")
     end
 
     def image(node)
@@ -149,7 +149,7 @@ module QiitaMarker
         out(' alt="', :children, '"')
       end
       out(' title="', escape_html(node.title), '"') if node.title && !node.title.empty?
-      out(' />')
+      out(" />")
     end
 
     def text(node)
@@ -157,9 +157,9 @@ module QiitaMarker
     end
 
     def code(node)
-      out('<code>')
+      out("<code>")
       out(escape_html(node.string_content))
-      out('</code>')
+      out("</code>")
     end
 
     def linebreak(_node)
@@ -170,7 +170,7 @@ module QiitaMarker
       if option_enabled?(:HARDBREAKS)
         out("<br />\n")
       elsif option_enabled?(:NOBREAKS)
-        out(' ')
+        out(" ")
       else
         out("\n")
       end
@@ -206,14 +206,14 @@ module QiitaMarker
               when :left then ' align="left"'
               when :right then ' align="right"'
               when :center then ' align="center"'
-              else; ''
+              else; ""
               end
       out(@in_header ? "<th#{align}#{sourcepos(node)}>" : "<td#{align}#{sourcepos(node)}>", :children, @in_header ? "</th>\n" : "</td>\n")
       @column_index += 1
     end
 
     def strikethrough(_)
-      out('<del>', :children, '</del>')
+      out("<del>", :children, "</del>")
     end
 
     def footnote_reference(node)
@@ -246,7 +246,7 @@ module QiitaMarker
     end
 
     def tasklist?(node)
-      node.type_string == 'tasklist'
+      node.type_string == "tasklist"
     end
 
     def checked?(node)

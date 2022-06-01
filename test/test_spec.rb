@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-require 'json'
+require "test_helper"
+require "json"
 
 class TestSpec < Minitest::Test
-  spec = open_spec_file('spec.txt')
+  spec = open_spec_file("spec.txt")
 
   spec.each do |testcase|
     next if testcase[:extensions].include?(:disabled)

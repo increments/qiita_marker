@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'test_helper'
+require "test_helper"
 
 class TestBasics < Minitest::Test
   def setup
-    @doc = QiitaMarker.render_doc('Hi *there*')
+    @doc = QiitaMarker.render_doc("Hi *there*")
   end
 
   def test_to_html
@@ -12,7 +12,7 @@ class TestBasics < Minitest::Test
   end
 
   def test_markdown_to_html
-    html = QiitaMarker.render_html('Hi *there*')
+    html = QiitaMarker.render_html("Hi *there*")
     assert_equal "<p>Hi <em>there</em></p>\n", html
   end
 

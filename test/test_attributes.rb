@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'test_helper'
+require "test_helper"
 
 class TestAttributes < Minitest::Test
   def setup
-    contents = fixtures_file('dingus.md')
+    contents = fixtures_file("dingus.md")
     @doc = QiitaMarker.render_doc(contents.strip)
   end
 

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require('test_helper')
+require("test_helper")
 
-describe 'TestQfmAutolinkClassName' do
+describe "TestQfmAutolinkClassName" do
   let(:options) { %i[AUTOLINK_CLASS_NAME] }
   let(:extensions) { %i[autolink] }
   let(:text) do
@@ -28,7 +28,7 @@ describe 'TestQfmAutolinkClassName' do
     assert_equal(expected, rendered_html)
   end
 
-  describe 'without AUTOLINK_CLASS_NAME option' do
+  describe "without AUTOLINK_CLASS_NAME option" do
     let(:options) { %i[DEFAULT] }
     let(:expected) do
       <<~HTML
@@ -44,7 +44,7 @@ describe 'TestQfmAutolinkClassName' do
     end
   end
 
-  describe 'without autolink extension' do
+  describe "without autolink extension" do
     let(:extensions) { %i[] }
     let(:expected) do
       <<~HTML
@@ -55,7 +55,7 @@ describe 'TestQfmAutolinkClassName' do
       HTML
     end
 
-    it 'does not append class name' do
+    it "does not append class name" do
       assert_equal(expected, rendered_html)
     end
   end

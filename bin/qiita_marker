@@ -1,13 +1,13 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'optparse'
+require "optparse"
 
-$LOAD_PATH.unshift File.join(File.dirname(__FILE__), '..', 'lib')
-require 'qiita_marker'
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__), "..", "lib")
+require "qiita_marker"
 
-root = File.expand_path('..', __dir__)
-$LOAD_PATH.unshift File.expand_path('lib', root)
+root = File.expand_path("..", __dir__)
+$LOAD_PATH.unshift File.expand_path("lib", root)
 
 def parse_options
   options = Struct.new(:active_extensions, :active_parse_options, :active_render_options, :output_format, :renderer)
@@ -18,17 +18,17 @@ def parse_options
   format_options = QiitaMarker::Config::OPTS.fetch(:format)
 
   option_parser = OptionParser.new do |opts|
-    opts.banner = 'Usage: qiita_marker [--html-renderer] [--extension=EXTENSION]'
-    opts.separator '                    [--to=FORMAT]'
-    opts.separator '                    [--parse-option=OPTION]'
-    opts.separator '                    [--render-option=OPTION]'
-    opts.separator '                    [FILE..]'
-    opts.separator ''
-    opts.separator 'Convert one or more CommonMark files to HTML and write to standard output.'
-    opts.separator 'If no FILE argument is provided, text will be read from STDIN.'
-    opts.separator ''
+    opts.banner = "Usage: qiita_marker [--html-renderer] [--extension=EXTENSION]"
+    opts.separator "                    [--to=FORMAT]"
+    opts.separator "                    [--parse-option=OPTION]"
+    opts.separator "                    [--render-option=OPTION]"
+    opts.separator "                    [FILE..]"
+    opts.separator ""
+    opts.separator "Convert one or more CommonMark files to HTML and write to standard output."
+    opts.separator "If no FILE argument is provided, text will be read from STDIN."
+    opts.separator ""
 
-    opts.on('--extension=EXTENSION', Array, 'Use EXTENSION for parsing and HTML output (unless --html-renderer is specified)') do |values|
+    opts.on("--extension=EXTENSION", Array, "Use EXTENSION for parsing and HTML output (unless --html-renderer is specified)") do |values|
       values.each do |value|
         if extensions.include?(value)
           options.active_extensions << value.to_sym
@@ -38,7 +38,7 @@ def parse_options
       end
     end
 
-    opts.on('-h', '--help', 'Prints this help') do
+    opts.on("-h", "--help", "Prints this help") do
       puts opts
       puts
       puts "Available formats: #{format_options.join(', ')}"
@@ -46,11 +46,11 @@ def parse_options
       puts "Available parse options: #{parse_options.keys.join(', ')}"
       puts "Available render options: #{render_options.keys.join(', ')}"
       puts
-      puts 'See the README for more information on these.'
+      puts "See the README for more information on these."
       exit
     end
 
-    opts.on('-tFORMAT', '--to=FORMAT', String, 'Specify output FORMAT') do |value|
+    opts.on("-tFORMAT", "--to=FORMAT", String, "Specify output FORMAT") do |value|
       value = value.to_sym
       if format_options.include?(value)
         options.output_format = value
@@ -59,11 +59,11 @@ def parse_options
       end
     end
 
-    opts.on('--html-renderer', 'Use the HtmlRenderer renderer rather than the native C renderer (only valid when format is html)') do
+    opts.on("--html-renderer", "Use the HtmlRenderer renderer rather than the native C renderer (only valid when format is html)") do
       options.renderer = true
     end
 
-    opts.on('--parse-option=OPTION', Array, 'OPTION passed during parsing') do |values|
+    opts.on("--parse-option=OPTION", Array, "OPTION passed during parsing") do |values|
       values.each do |value|
         if parse_options.key?(value.to_sym)
           options.active_parse_options << value.to_sym
@@ -73,7 +73,7 @@ def parse_options
       end
     end
 
-    opts.on('--render-option=OPTION', Array, 'OPTION passed during rendering') do |values|
+    opts.on("--render-option=OPTION", Array, "OPTION passed during rendering") do |values|
       values.each do |value|
         if render_options.key?(value.to_sym)
           options.active_render_options << value.to_sym
@@ -83,7 +83,7 @@ def parse_options
       end
     end
 
-    opts.on('-v', '--version', 'Version information') do
+    opts.on("-v", "--version", "Version information") do
       puts "qiita_marker #{QiitaMarker::VERSION}"
       exit
     end

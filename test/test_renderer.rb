@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'test_helper'
+require "test_helper"
 
 class TestRenderer < Minitest::Test
   def setup
-    @doc = QiitaMarker.render_doc('Hi *there*')
+    @doc = QiitaMarker.render_doc("Hi *there*")
   end
 
   def test_html_renderer

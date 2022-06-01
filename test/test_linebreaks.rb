@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'test_helper'
+require "test_helper"
 
 class TestLinebreaks < Minitest::Test
   def test_hardbreak_no_spaces

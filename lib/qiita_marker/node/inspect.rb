@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'pp'
+require "pp"
 
 module QiitaMarker
   class Node
@@ -8,12 +8,12 @@ module QiitaMarker
       PP_INDENT_SIZE = 2
 
       def inspect
-        PP.pp(self, +'', Float::INFINITY)
+        PP.pp(self, +"", Float::INFINITY)
       end
 
       # @param printer [PrettyPrint] pp
       def pretty_print(printer)
-        printer.group(PP_INDENT_SIZE, "#<#{self.class}(#{type}):", '>') do
+        printer.group(PP_INDENT_SIZE, "#<#{self.class}(#{type}):", ">") do
           printer.breakable
 
           attrs = %i[
@@ -46,7 +46,7 @@ module QiitaMarker
                 children << node
                 node = node.next
               end
-              printer.text 'children='
+              printer.text "children="
               printer.pp children
             end
           end

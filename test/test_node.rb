@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'test_helper'
+require "test_helper"
 
 class TestNode < Minitest::Test
   def setup
-    @doc = QiitaMarker.render_doc('Hi *there*, I am mostly text!')
+    @doc = QiitaMarker.render_doc("Hi *there*, I am mostly text!")
   end
 
   def test_walk
@@ -63,7 +63,7 @@ class TestNode < Minitest::Test
 
   def test_walk_and_set_string_content
     @doc.walk do |node|
-      node.string_content = 'world' if node.type == :text && node.string_content == 'there'
+      node.string_content = "world" if node.type == :text && node.string_content == "there"
     end
     result = HtmlRenderer.new.render(@doc)
     assert_equal "<p>Hi <em>world</em>, I am mostly text!</p>\n", result
@@ -84,6 +84,6 @@ class TestNode < Minitest::Test
   end
 
   def test_pretty_print
-    assert_match(/#<QiitaMarker::Node\(document\):/, PP.pp(@doc, +''))
+    assert_match(/#<QiitaMarker::Node\(document\):/, PP.pp(@doc, +""))
   end
 end

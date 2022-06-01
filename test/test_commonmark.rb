@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'test_helper'
+require "test_helper"
 
 class TestCommonmark < Minitest::Test
   HTML_COMMENT = /<!--.*?-->\s?/.freeze
@@ -30,7 +30,7 @@ class TestCommonmark < Minitest::Test
     compare = render_doc(@markdown).to_commonmark
 
     assert_equal \
-      render_doc(@markdown).to_html.squeeze(' ').gsub(HTML_COMMENT, ''),
-      render_doc(compare).to_html.squeeze(' ').gsub(HTML_COMMENT, '')
+      render_doc(@markdown).to_html.squeeze(" ").gsub(HTML_COMMENT, ""),
+      render_doc(compare).to_html.squeeze(" ").gsub(HTML_COMMENT, "")
   end
 end
