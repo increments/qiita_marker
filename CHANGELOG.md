@@ -6,6 +6,10 @@
 
 ### Changed
 
+## 0.23.6.1 - 2022-11-10
+
+- Finish testing phase and release official version.
+
 ## 0.23.6.0 - 2022-10-04
 
 ### Changed
