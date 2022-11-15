@@ -118,13 +118,13 @@ static void html_render(cmark_syntax_extension *extension,
   bool entering = (ev_type == CMARK_EVENT_ENTER);
   if (entering) {
     cmark_html_render_cr(renderer->html);
-    cmark_strbuf_puts(renderer->html, "<li");
+    cmark_strbuf_puts(renderer->html, "<li class=\"task-list-item\"");
     cmark_html_render_sourcepos(node, renderer->html, options);
     cmark_strbuf_putc(renderer->html, '>');
     if (node->as.list.checked) {
-      cmark_strbuf_puts(renderer->html, "<input type=\"checkbox\" checked=\"\" disabled=\"\" /> ");
+      cmark_strbuf_puts(renderer->html, "<input type=\"checkbox\" class=\"task-list-item-checkbox\" checked=\"\" disabled=\"\" /> ");
     } else {
-      cmark_strbuf_puts(renderer->html, "<input type=\"checkbox\" disabled=\"\" /> ");
+      cmark_strbuf_puts(renderer->html, "<input type=\"checkbox\" class=\"task-list-item-checkbox\" disabled=\"\" /> ");
     }
   } else {
     cmark_strbuf_puts(renderer->html, "</li>\n");

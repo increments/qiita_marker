@@ -11,8 +11,8 @@ class TestTasklists < Minitest::Test
     @doc = QiitaMarker.render_doc(text, :DEFAULT, [:tasklist])
     @expected = <<~HTML
       <ul>
-      <li><input type="checkbox" checked="" disabled="" /> Add task list</li>
-      <li><input type="checkbox" disabled="" /> Define task list</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" checked="" disabled="" /> Add task list</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="" /> Define task list</li>
       </ul>
     HTML
   end

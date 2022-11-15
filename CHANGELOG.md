@@ -6,6 +6,8 @@
 
 ### Changed
 
+- [#36](https://github.com/increments/qiita_marker/pull/36): Append class to tasklist
+
 ## 0.23.6.1 - 2022-11-10
 
 - Finish testing phase and release official version.

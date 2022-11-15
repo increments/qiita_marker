@@ -57,7 +57,12 @@ module QiitaMarker
     def list_item(node)
       block do
         tasklist_data = tasklist(node)
-        container("<li#{sourcepos(node)}#{tasklist_data}>#{" " if tasklist?(node)}", "</li>") do
+        beginning_of_list = if tasklist?(node)
+          "<li class=\"task-list-item\"#{sourcepos(node)}#{tasklist_data}> "
+        else
+          "<li#{sourcepos(node)}#{tasklist_data}>"
+        end
+        container(beginning_of_list, "</li>") do
           out(:children)
         end
       end
@@ -71,7 +76,7 @@ module QiitaMarker
       else
         'disabled=""'
       end
-      "><input type=\"checkbox\" #{state} /"
+      "><input type=\"checkbox\" class=\"task-list-item-checkbox\" #{state} /"
     end
 
     def blockquote(node)
