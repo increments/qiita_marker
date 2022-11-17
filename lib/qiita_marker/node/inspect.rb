@@ -16,11 +16,11 @@ module QiitaMarker
         printer.group(PP_INDENT_SIZE, "#<#{self.class}(#{type}):", ">") do
           printer.breakable
 
-          attrs = [:sourcepos, :string_content, :url, :title, :header_level, :list_type, :list_start, :list_tight, :fence_info].map do |name|
+          attrs = [:sourcepos, :string_content, :url, :title, :header_level, :list_type, :list_start, :list_tight, :fence_info].filter_map do |name|
             [name, __send__(name)]
           rescue NodeError
             nil
-          end.compact
+          end
 
           printer.seplist(attrs) do |name, value|
             printer.text("#{name}=")
