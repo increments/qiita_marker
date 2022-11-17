@@ -6,6 +6,8 @@
 
 ### Changed
 
+- [#38](https://github.com/increments/qiita_marker/pull/38): Drop Ruby 2.6 support
+
 ## 0.23.6.1 - 2022-11-10
 
 - Finish testing phase and release official version.
