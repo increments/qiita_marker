@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 module QiitaMarker
-  VERSION = "0.23.6.2"
+  VERSION = "0.23.9"
 end

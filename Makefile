@@ -21,6 +21,3 @@ ext/qiita_marker/cmark-gfm_export.h: ext/qiita_marker/cmark-upstream/build/src/c
 
 ext/qiita_marker/cmark-gfm_version.h: ext/qiita_marker/cmark-upstream/build/src/cmark-gfm_version.h
 	cp $< $@
-
-ext/qiita_marker/cmark-gfm-extensions_export.h: ext/qiita_marker/cmark-upstream/build/extensions/cmark-gfm-extensions_export.h
-	cp $< $@
