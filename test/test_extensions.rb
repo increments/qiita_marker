@@ -71,8 +71,10 @@ class TestExtensions < Minitest::Test
   end
 
   def test_comments_are_kept_as_expected
-    assert_equal("<!--hello--> <blah> &lt;xmp>\n",
-      QiitaMarker.render_html("<!--hello--> <blah> <xmp>\n", :UNSAFE, [:tagfilter]))
+    assert_equal(
+      "<!--hello--> <blah> &lt;xmp>\n",
+      QiitaMarker.render_html("<!--hello--> <blah> <xmp>\n", :UNSAFE, [:tagfilter]),
+    )
   end
 
   def test_table_prefer_style_attributes

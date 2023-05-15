@@ -40,7 +40,7 @@ class TestNode < Minitest::Test
   def test_select
     nodes = @doc.first_child.select { |node| node.type == :text }
 
-    assert_equal(QiitaMarker::Node, nodes.first.class)
+    assert_instance_of(QiitaMarker::Node, nodes.first)
     assert_equal([:text, :text], nodes.map(&:type))
   end
 

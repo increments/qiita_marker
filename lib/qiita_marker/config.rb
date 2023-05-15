@@ -54,6 +54,6 @@ module QiitaMarker
       rescue KeyError => e
         raise TypeError, "option ':#{e.key}' does not exist for #{name}::OPTS[:#{type}]"
       end
-  end
+    end
   end
 end

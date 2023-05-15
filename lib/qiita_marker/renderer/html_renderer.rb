@@ -9,8 +9,15 @@ module QiitaMarker
 
     def header(node)
       block do
-        out("<h", node.header_level, "#{sourcepos(node)}>", :children,
-          "</h", node.header_level, ">")
+        out(
+          "<h",
+          node.header_level,
+          "#{sourcepos(node)}>",
+          :children,
+          "</h",
+          node.header_level,
+          ">",
+        )
       end
     end
 
