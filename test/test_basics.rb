@@ -13,6 +13,7 @@ class TestBasics < Minitest::Test
 
   def test_markdown_to_html
     html = QiitaMarker.render_html("Hi *there*")
+
     assert_equal("<p>Hi <em>there</em></p>\n", html)
   end
 

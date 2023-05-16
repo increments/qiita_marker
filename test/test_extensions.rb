@@ -17,6 +17,7 @@ class TestExtensions < Minitest::Test
     QiitaMarker.render_html(@markdown, :DEFAULT, [:table]).tap do |out|
       refute_includes(out, "| a")
       ["<table>", "<tr>", "<th>", "a", "</th>", "<td>", "c", "</td>", "<strong>x</strong>"].each { |html| assert_includes(out, html) }
+
       assert_includes(out, "~~hi~~")
     end
 
@@ -27,9 +28,11 @@ class TestExtensions < Minitest::Test
     end
 
     doc = QiitaMarker.render_doc("~a~ ~~b~~ ~~~c~~~", :STRIKETHROUGH_DOUBLE_TILDE, [:strikethrough])
+
     assert_equal("<p>~a~ <del>b</del> ~~~c~~~</p>\n", doc.to_html)
 
     html = QiitaMarker.render_html("~a~ ~~b~~ ~~~c~~~", :STRIKETHROUGH_DOUBLE_TILDE, [:strikethrough])
+
     assert_equal("<p>~a~ <del>b</del> ~~~c~~~</p>\n", html)
 
     QiitaMarker.render_html(@markdown, :DEFAULT, [:table, :strikethrough]).tap do |out|
@@ -45,16 +48,19 @@ class TestExtensions < Minitest::Test
     doc.to_html.tap do |out|
       refute_includes(out, "| a")
       ["<table>", "<tr>", "<th>", "a", "</th>", "<td>", "c", "</td>", "<strong>x</strong>"].each { |html| assert_includes(out, html) }
+
       assert_includes(out, "~~hi~~")
     end
 
     HtmlRenderer.new.render(doc).tap do |out|
       refute_includes(out, "| a")
       ["<table>", "<tr>", "<th>", "a", "</th>", "<td>", "c", "</td>", "<strong>x</strong>"].each { |html| assert_includes(out, html) }
+
       assert_includes(out, "~~hi~~")
     end
 
     doc = QiitaMarker.render_doc("~a~ ~~b~~ ~~~c~~~", :STRIKETHROUGH_DOUBLE_TILDE, [:strikethrough])
+
     assert_equal("<p>~a~ <del>b</del> ~~~c~~~</p>\n", HtmlRenderer.new.render(doc))
   end
 
@@ -65,8 +71,10 @@ class TestExtensions < Minitest::Test
   end
 
   def test_comments_are_kept_as_expected
-    assert_equal("<!--hello--> <blah> &lt;xmp>\n",
-      QiitaMarker.render_html("<!--hello--> <blah> <xmp>\n", :UNSAFE, [:tagfilter]))
+    assert_equal(
+      "<!--hello--> <blah> &lt;xmp>\n",
+      QiitaMarker.render_html("<!--hello--> <blah> <xmp>\n", :UNSAFE, [:tagfilter]),
+    )
   end
 
   def test_table_prefer_style_attributes

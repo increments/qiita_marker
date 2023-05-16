@@ -74,6 +74,7 @@ module QiitaMarker
       err = assert_raises(TypeError) do
         QiitaMarker.render_doc("foo \n baz", :safe)
       end
+
       assert_equal("option ':safe' does not exist for QiitaMarker::Config::OPTS[:parse]", err.message)
 
       assert_raises(TypeError) do

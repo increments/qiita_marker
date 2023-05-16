@@ -3,7 +3,7 @@
 require "test_helper"
 
 class TestCommonmark < Minitest::Test
-  HTML_COMMENT = /<!--.*?-->\s?/.freeze
+  HTML_COMMENT = /<!--.*?-->\s?/
 
   def setup
     @markdown = <<~MD
@@ -29,9 +29,9 @@ class TestCommonmark < Minitest::Test
   def test_to_commonmark
     compare = render_doc(@markdown).to_commonmark
 
-    assert_equal(\
+    assert_equal(
       render_doc(@markdown).to_html.squeeze(" ").gsub(HTML_COMMENT, ""),
-      render_doc(compare).to_html.squeeze(" ").gsub(HTML_COMMENT, "")
+      render_doc(compare).to_html.squeeze(" ").gsub(HTML_COMMENT, ""),
     )
   end
 end

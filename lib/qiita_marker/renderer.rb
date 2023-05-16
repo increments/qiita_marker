@@ -113,7 +113,7 @@ module QiitaMarker
             )
             (?=\s|>|/>)
           }xi,
-          '&lt;\1'
+          '&lt;\1',
         )
       else
         str
