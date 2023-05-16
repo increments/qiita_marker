@@ -6,8 +6,13 @@
 
 ### Changed
 
-- Update base CommonMarker version to `v0.23.9`.
-- Drop Ruby 2.7 support
+## 0.23.9.0 - 2023-05-16
+
+### Changed
+
+- [#40](https://github.com/increments/qiita_marker/pull/40)
+  - Update base CommonMarker version to `v0.23.9`.
+  - Drop Ruby 2.7 support
 
 ## 0.23.6.2 - 2022-11-18
 
