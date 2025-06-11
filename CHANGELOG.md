@@ -4,9 +4,14 @@
 
 ### Added
 
-- Pin github actions
+### Changed
+
+## 0.23.9.1 - 2025-06-11
 
 ### Changed
+
+- [#42](https://github.com/increments/qiita_marker/pull/42)
+  - Pin github actions
 
 ## 0.23.9.0 - 2023-05-16
 
