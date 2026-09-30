@@ -10,7 +10,7 @@ require "qiita_marker/version"
 
 begin
   require "awesome_print"
-rescue LoadError; end # rubocop:disable Lint/SuppressedException
+rescue LoadError; end
 module QiitaMarker
   class << self
     # Public:  Parses a Markdown string into an HTML string.
