@@ -1,4 +1,4 @@
-FROM ruby:3.0.6
+FROM ruby:3.4
 
 ENV RE2C_VERSION 1.3
 
