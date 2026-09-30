@@ -12,8 +12,11 @@ group :development do
   gem "rake"
   gem "rake-compiler", "~> 0.9"
   gem "rdoc", "~> 6.2"
-  gem "rubocop"
-  gem "rubocop-standard"
+  # rubocop-standard depends on sorbet-static, which has no Windows build
+  unless Gem.win_platform?
+    gem "rubocop"
+    gem "rubocop-standard"
+  end
 end
 
 group :benchmark do
