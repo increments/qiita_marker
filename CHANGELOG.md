@@ -8,6 +8,8 @@
 
 ### Changed
 
+- Drop Ruby 3.0, 3.1 and 3.2 support
+
 ## 0.23.9.0 - 2023-05-16
 
 ### Changed

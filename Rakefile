@@ -38,9 +38,12 @@ task "test:unit" => :compile
 desc "Run unit and conformance tests"
 task test: ["test:unit"]
 
-require "rubocop/rake_task"
+# RuboCop is not installed on Windows (see Gemfile)
+unless Gem.win_platform?
+  require "rubocop/rake_task"
 
-RuboCop::RakeTask.new(:rubocop)
+  RuboCop::RakeTask.new(:rubocop)
+end
 
 desc "Run benchmarks"
 task :benchmark do

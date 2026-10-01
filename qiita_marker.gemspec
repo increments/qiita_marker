@@ -20,19 +20,9 @@ Gem::Specification.new do |s|
 
   s.executables = ["qiita_marker"]
   s.require_paths = ["lib", "ext"]
-  s.required_ruby_version = [">= 3.0", "< 4.0"]
+  s.required_ruby_version = [">= 3.3", "< 4.0"]
 
   s.metadata["rubygems_mfa_required"] = "true"
 
   s.rdoc_options += ["-x", "ext/qiita_marker/cmark/.*"]
-
-  s.add_development_dependency("awesome_print")
-  s.add_development_dependency("json", "~> 2.3")
-  s.add_development_dependency("minitest", "~> 5.6")
-  s.add_development_dependency("minitest-focus", "~> 1.1")
-  s.add_development_dependency("rake")
-  s.add_development_dependency("rake-compiler", "~> 0.9")
-  s.add_development_dependency("rdoc", "~> 6.2")
-  s.add_development_dependency("rubocop")
-  s.add_development_dependency("rubocop-standard")
 end
