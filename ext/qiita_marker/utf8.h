@@ -28,6 +28,18 @@ int cmark_utf8proc_is_space(int32_t uc);
 CMARK_GFM_EXPORT
 int cmark_utf8proc_is_punctuation(int32_t uc);
 
+CMARK_GFM_EXPORT
+int cmark_utf8proc_is_cjk_character(int32_t uc);
+
+CMARK_GFM_EXPORT
+int cmark_utf8proc_is_non_cjk_punctuation_character(int32_t uc);
+
+CMARK_GFM_EXPORT
+int cmark_utf8proc_is_ideographic_variation_selector(int32_t uc);
+
+CMARK_GFM_EXPORT
+int cmark_utf8proc_is_non_emoji_general_use_variation_selector(int32_t uc);
+
 #ifdef __cplusplus
 }
 #endif

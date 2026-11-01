@@ -315,3 +315,59 @@ int cmark_utf8proc_is_punctuation(int32_t uc) {
       uc == 92917 || (uc >= 92983 && uc <= 92987) || uc == 92996 ||
       uc == 113823);
 }
+
+// Unicode 18 CJK characters: East Asian Width F/W/H excluding default emoji,
+// plus characters whose Script is Hangul.
+// Source: tats-u/markdown-cjk-friendly, ranges.md (71d6b25).
+// https://github.com/tats-u/markdown-cjk-friendly/blob/71d6b25d406a31d0303b102d582bd675067ed73f/ranges.md
+int cmark_utf8proc_is_cjk_character(int32_t uc) {
+  if (uc < 0x1100)
+    return 0;
+
+  return (0x1100 <= uc && uc <= 0x11FF) || (uc == 0x20A9)
+    || (0x2329 <= uc && uc <= 0x232A) || (0x2630 <= uc && uc <= 0x2637)
+    || (0x268A <= uc && uc <= 0x268F) || (0x2E80 <= uc && uc <= 0x2E99)
+    || (0x2E9B <= uc && uc <= 0x2EF3) || (0x2F00 <= uc && uc <= 0x2FD5)
+    || (0x2FF0 <= uc && uc <= 0x303E) || (0x3041 <= uc && uc <= 0x3096)
+    || (0x3099 <= uc && uc <= 0x30FF) || (0x3105 <= uc && uc <= 0x312F)
+    || (0x3131 <= uc && uc <= 0x318E) || (0x3190 <= uc && uc <= 0x31E5)
+    || (0x31EF <= uc && uc <= 0x321E) || (0x3220 <= uc && uc <= 0x3247)
+    || (0x3250 <= uc && uc <= 0xA48C) || (0xA490 <= uc && uc <= 0xA4C6)
+    || (0xA960 <= uc && uc <= 0xA97C) || (0xAC00 <= uc && uc <= 0xD7A3)
+    || (0xD7B0 <= uc && uc <= 0xD7C6) || (0xD7CB <= uc && uc <= 0xD7FB)
+    || (0xF900 <= uc && uc <= 0xFAFF) || (0xFE10 <= uc && uc <= 0xFE19)
+    || (0xFE30 <= uc && uc <= 0xFE52) || (0xFE54 <= uc && uc <= 0xFE66)
+    || (0xFE68 <= uc && uc <= 0xFE6B) || (0xFF01 <= uc && uc <= 0xFFBE)
+    || (0xFFC2 <= uc && uc <= 0xFFC7) || (0xFFCA <= uc && uc <= 0xFFCF)
+    || (0xFFD2 <= uc && uc <= 0xFFD7) || (0xFFDA <= uc && uc <= 0xFFDC)
+    || (0xFFE0 <= uc && uc <= 0xFFE6) || (0xFFE8 <= uc && uc <= 0xFFEE)
+    || (0x16FE0 <= uc && uc <= 0x16FE4) || (0x16FF0 <= uc && uc <= 0x16FF6)
+    || (0x17000 <= uc && uc <= 0x18CDA) || (0x18CFF <= uc && uc <= 0x18D20)
+    || (0x18D80 <= uc && uc <= 0x18DF2) || (0x18E00 <= uc && uc <= 0x19191)
+    || (0x191A0 <= uc && uc <= 0x191D2) || (0x1AFF0 <= uc && uc <= 0x1AFF3)
+    || (0x1AFF5 <= uc && uc <= 0x1AFFB) || (0x1AFFD <= uc && uc <= 0x1AFFE)
+    || (0x1B000 <= uc && uc <= 0x1B128) || (uc == 0x1B132)
+    || (0x1B150 <= uc && uc <= 0x1B152) || (uc == 0x1B155)
+    || (0x1B164 <= uc && uc <= 0x1B168) || (0x1B170 <= uc && uc <= 0x1B2FB)
+    || (0x1D300 <= uc && uc <= 0x1D356) || (0x1D360 <= uc && uc <= 0x1D376)
+    || (uc == 0x1F1AE) || (uc == 0x1F200) || (uc == 0x1F202)
+    || (0x1F210 <= uc && uc <= 0x1F219)
+    || (0x1F21B <= uc && uc <= 0x1F22E) || (0x1F230 <= uc && uc <= 0x1F231)
+    || (uc == 0x1F237) || (uc == 0x1F23B) || (0x1F240 <= uc && uc <= 0x1F248)
+    || (0x1F260 <= uc && uc <= 0x1F265) || (uc == 0x1F7DA)
+    || (0x20000 <= uc && uc <= 0x3FFFD);
+}
+
+int cmark_utf8proc_is_non_cjk_punctuation_character(int32_t uc) {
+  return cmark_utf8proc_is_punctuation(uc) && !cmark_utf8proc_is_cjk_character(uc);
+}
+
+// Ideographic Variation Selectors: U+E0100..U+E01EF
+int cmark_utf8proc_is_ideographic_variation_selector(int32_t uc) {
+  return 0xE0100 <= uc && uc <= 0xE01EF;
+}
+
+// Variation Selectors (excluding Emoji Presentation Selector U+FE0F): U+FE00..U+FE0E
+int cmark_utf8proc_is_non_emoji_general_use_variation_selector(int32_t uc) {
+  return 0xFE00 <= uc && uc <= 0xFE0E;
+}

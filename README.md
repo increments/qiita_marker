@@ -2,7 +2,7 @@
 
 [![Build Status](https://github.com/increments/qiita-marker/actions/workflows/test.yml/badge.svg)](https://github.com/increments/qiita-marker/actions/workflows/test.yml) [![Gem Version](https://badge.fury.io/rb/qiita_marker.svg)](https://badge.fury.io/rb/qiita_marker)
 
-Qiita Marker is a Ruby library for Markdown processing, based on [CommonMarker](https://github.com/gjtorikian/commonmarker).
+Qiita Marker is a Ruby library for Markdown processing, based on [CommonMarker](https://github.com/gjtorikian/commonmarker) 0.x and its cmark-gfm parser.
 It will be a core module of [Qiita Markdown](https://github.com/increments/qiita-markdown) gem and not intended for direct use. If you are looking for Qiita-specified markdown processor, use [Qiita Markdown](https://github.com/increments/qiita-markdown) gem.
 
 ## Usage
@@ -31,6 +31,8 @@ In addition to CommonMarker's options and extensions, the following are availabl
 ### Original extensions
 
 - `:custom_block` - This provides support for customizable blocks.
+- `:cjk_friendly_emphasis` - This provides support for [CJK-friendly Emphasis](https://github.com/tats-u/markdown-cjk-friendly).
+  Also applies to strikethrough when combined with `:strikethrough`.
 
 ## Contributing
 

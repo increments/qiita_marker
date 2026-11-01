@@ -65,6 +65,7 @@ typedef struct subject{
   bufsize_t backticks[MAXBACKTICKS + 1];
   bool scanned_for_backticks;
   bool no_link_openers;
+  bool cjk_friendly_emphasis;
 } subject;
 
 // Extensions may populate this.
@@ -202,6 +203,7 @@ static void subject_from_buf(cmark_mem *mem, int line_number, int block_offset, 
   }
   e->scanned_for_backticks = false;
   e->no_link_openers = true;
+  e->cjk_friendly_emphasis = false;
 }
 
 static CMARK_INLINE int isbacktick(int c) { return (c == '`'); }
@@ -411,6 +413,12 @@ static cmark_node *handle_backticks(subject *subj, int options) {
   }
 }
 
+// Unicode 18 fullwidth forms of ambiguous quotation marks, selected by VS2.
+static bool is_cjk_ambiguous_punctuation_sequence(int32_t base, int32_t selector) {
+  return selector == 0xFE01 &&
+         (base == 0x2018 || base == 0x2019 || base == 0x201C || base == 0x201D);
+}
+
 // Scan ***, **, or * and return number scanned, or 0.
 // Advances position.
 static int scan_delims(subject *subj, unsigned char c, bool *can_open,
@@ -420,7 +428,12 @@ static int scan_delims(subject *subj, unsigned char c, bool *can_open,
   int32_t after_char = 0;
   int32_t before_char = 0;
   int len;
-  bool left_flanking, right_flanking;
+  bool left_flanking, right_flanking, space_before, space_after;
+  bool cjk = subj->cjk_friendly_emphasis;
+
+  // Only general-use variation selectors need the preceding base character.
+  bufsize_t before_before_char_pos;
+  int32_t before_before_char = 0;
 
   if (mention_no_emphasis &&
       is_part_of_mention(subj->input.data + subj->pos, subj->pos)) {
@@ -443,6 +456,23 @@ static int scan_delims(subject *subj, unsigned char c, bool *can_open,
                                  subj->pos - before_char_pos, &before_char);
     if (len == -1 || (before_char < 256 && SKIP_CHARS[(unsigned char) before_char])) {
       before_char = 10;
+    }
+
+    if (cjk && cmark_utf8proc_is_non_emoji_general_use_variation_selector(before_char)) {
+      if (before_char_pos == 0) {
+        before_before_char = 10;
+      } else {
+        before_before_char_pos = before_char_pos - 1;
+        while ((peek_at(subj, before_before_char_pos) >> 6 == 2 || SKIP_CHARS[peek_at(subj, before_before_char_pos)]) && before_before_char_pos > 0) {
+          before_before_char_pos -= 1;
+        }
+        len = cmark_utf8proc_iterate(subj->input.data + before_before_char_pos,
+                                     subj->pos - before_before_char_pos,
+                                     &before_before_char);
+        if (len == -1 || (before_before_char < 256 && SKIP_CHARS[(unsigned char) before_before_char])) {
+          before_before_char = 10;
+        }
+      }
     }
   }
 
@@ -470,26 +500,78 @@ static int scan_delims(subject *subj, unsigned char c, bool *can_open,
   }
   }
 
-  left_flanking = numdelims > 0 && !cmark_utf8proc_is_space(after_char) &&
-                  (!cmark_utf8proc_is_punctuation(after_char) ||
-                   cmark_utf8proc_is_space(before_char) ||
-                   cmark_utf8proc_is_punctuation(before_char));
-  right_flanking = numdelims > 0 && !cmark_utf8proc_is_space(before_char) &&
-                   (!cmark_utf8proc_is_punctuation(before_char) ||
-                    cmark_utf8proc_is_space(after_char) ||
-                    cmark_utf8proc_is_punctuation(after_char));
-  if (c == '_') {
-    *can_open = left_flanking &&
-                (!right_flanking || cmark_utf8proc_is_punctuation(before_char));
-    *can_close = right_flanking &&
-                 (!left_flanking || cmark_utf8proc_is_punctuation(after_char));
-  } else if (c == '\'' || c == '"') {
-    *can_open = left_flanking && !right_flanking &&
-	         before_char != ']' && before_char != ')';
-    *can_close = right_flanking;
+  space_before = cmark_utf8proc_is_space(before_char) != 0;
+  space_after = cmark_utf8proc_is_space(after_char) != 0;
+
+  // Whitespace alone determines whether an emphasis run can open or close.
+  if ((c == '*' || c == '_') && (space_before || space_after)) {
+    *can_open = numdelims > 0 && !space_after;
+    *can_close = numdelims > 0 && !space_before;
+    return numdelims;
+  }
+
+  // With no adjacent whitespace, underscores only depend on punctuation.
+  if (cjk && c == '_') {
+    int32_t before_main_char =
+        cmark_utf8proc_is_non_emoji_general_use_variation_selector(before_char)
+            ? before_before_char : before_char;
+    *can_open = numdelims > 0 && cmark_utf8proc_is_punctuation(before_main_char);
+    *can_close = numdelims > 0 && cmark_utf8proc_is_punctuation(after_char);
+    return numdelims;
+  }
+
+  if (cjk) {
+    // CJK-friendly flanking rules
+    left_flanking = numdelims > 0 && !space_after &&
+                    (!cmark_utf8proc_is_non_cjk_punctuation_character(after_char) ||
+                     space_before ||
+                     cmark_utf8proc_is_non_cjk_punctuation_character(before_char) ||
+                     cmark_utf8proc_is_cjk_character(before_char) ||
+                     cmark_utf8proc_is_ideographic_variation_selector(before_char) ||
+                     (cmark_utf8proc_is_non_emoji_general_use_variation_selector(before_char) &&
+                      (cmark_utf8proc_is_cjk_character(before_before_char) ||
+                       cmark_utf8proc_is_non_cjk_punctuation_character(before_before_char))));
+
+    right_flanking = numdelims > 0 && !space_before &&
+                     (!(cmark_utf8proc_is_non_cjk_punctuation_character(before_char) ||
+                        (cmark_utf8proc_is_non_emoji_general_use_variation_selector(before_char) &&
+                         cmark_utf8proc_is_non_cjk_punctuation_character(before_before_char) &&
+                         !is_cjk_ambiguous_punctuation_sequence(before_before_char, before_char))) ||
+                      space_after ||
+                      cmark_utf8proc_is_non_cjk_punctuation_character(after_char) ||
+                      cmark_utf8proc_is_cjk_character(after_char));
+
+    if (c == '\'' || c == '"') {
+      *can_open = left_flanking && !right_flanking &&
+                  before_char != ']' && before_char != ')';
+      *can_close = right_flanking;
+    } else {
+      *can_open = left_flanking;
+      *can_close = right_flanking;
+    }
   } else {
-    *can_open = left_flanking;
-    *can_close = right_flanking;
+    // Standard CommonMark flanking rules
+    left_flanking = numdelims > 0 && !space_after &&
+                    (!cmark_utf8proc_is_punctuation(after_char) ||
+                     space_before ||
+                     cmark_utf8proc_is_punctuation(before_char));
+    right_flanking = numdelims > 0 && !space_before &&
+                     (!cmark_utf8proc_is_punctuation(before_char) ||
+                      space_after ||
+                      cmark_utf8proc_is_punctuation(after_char));
+    if (c == '_') {
+      *can_open = left_flanking &&
+                  (!right_flanking || cmark_utf8proc_is_punctuation(before_char));
+      *can_close = right_flanking &&
+                   (!left_flanking || cmark_utf8proc_is_punctuation(after_char));
+    } else if (c == '\'' || c == '"') {
+      *can_open = left_flanking && !right_flanking &&
+                  before_char != ']' && before_char != ')';
+      *can_close = right_flanking;
+    } else {
+      *can_open = left_flanking;
+      *can_close = right_flanking;
+    }
   }
   return numdelims;
 }
@@ -1549,6 +1631,7 @@ void cmark_parse_inlines(cmark_parser *parser,
   subject subj;
   cmark_chunk content = {parent->content.ptr, parent->content.size, 0};
   subject_from_buf(parser->mem, parent->start_line, parent->start_column - 1 + parent->internal_offset, &subj, &content, refmap);
+  subj.cjk_friendly_emphasis = parser->cjk_friendly_emphasis;
   cmark_chunk_rtrim(&subj.input);
 
   while (!is_eof(&subj) && parse_inline(parser, &subj, parent, options))
@@ -1705,19 +1788,53 @@ int cmark_inline_parser_scan_delimiters(cmark_inline_parser *parser,
   int32_t before_char = 0;
   int len;
   bool space_before, space_after;
+  bool cjk = parser->cjk_friendly_emphasis;
+
+  // Only general-use variation selectors need the preceding base character.
+  bufsize_t before_before_char_pos;
+  int32_t before_before_char = 0;
 
   if (parser->pos == 0) {
     before_char = 10;
   } else {
     before_char_pos = parser->pos - 1;
     // walk back to the beginning of the UTF_8 sequence:
-    while (peek_at(parser, before_char_pos) >> 6 == 2 && before_char_pos > 0) {
-      before_char_pos -= 1;
+    if (cjk) {
+      while ((peek_at(parser, before_char_pos) >> 6 == 2 || SKIP_CHARS[peek_at(parser, before_char_pos)]) && before_char_pos > 0) {
+        before_char_pos -= 1;
+      }
+    } else {
+      while (peek_at(parser, before_char_pos) >> 6 == 2 && before_char_pos > 0) {
+        before_char_pos -= 1;
+      }
     }
     len = cmark_utf8proc_iterate(parser->input.data + before_char_pos,
                                  parser->pos - before_char_pos, &before_char);
-    if (len == -1) {
-      before_char = 10;
+    if (cjk) {
+      if (len == -1 || (before_char < 256 && SKIP_CHARS[(unsigned char) before_char])) {
+        before_char = 10;
+      }
+    } else {
+      if (len == -1) {
+        before_char = 10;
+      }
+    }
+
+    if (cjk && cmark_utf8proc_is_non_emoji_general_use_variation_selector(before_char)) {
+      if (before_char_pos == 0) {
+        before_before_char = 10;
+      } else {
+        before_before_char_pos = before_char_pos - 1;
+        while ((peek_at(parser, before_before_char_pos) >> 6 == 2 || SKIP_CHARS[peek_at(parser, before_before_char_pos)]) && before_before_char_pos > 0) {
+          before_before_char_pos -= 1;
+        }
+        len = cmark_utf8proc_iterate(parser->input.data + before_before_char_pos,
+                                     parser->pos - before_before_char_pos,
+                                     &before_before_char);
+        if (len == -1 || (before_before_char < 256 && SKIP_CHARS[(unsigned char) before_before_char])) {
+          before_before_char = 10;
+        }
+      }
     }
   }
 
@@ -1726,10 +1843,22 @@ int cmark_inline_parser_scan_delimiters(cmark_inline_parser *parser,
     advance(parser);
   }
 
-  len = cmark_utf8proc_iterate(parser->input.data + parser->pos,
-                               parser->input.len - parser->pos, &after_char);
-  if (len == -1) {
-    after_char = 10;
+  if (cjk) {
+    bufsize_t after_char_pos = parser->pos;
+    while (SKIP_CHARS[peek_at(parser, after_char_pos)] && after_char_pos < parser->input.len) {
+      after_char_pos += 1;
+    }
+    len = cmark_utf8proc_iterate(parser->input.data + after_char_pos,
+                                 parser->input.len - after_char_pos, &after_char);
+    if (len == -1 || (after_char < 256 && SKIP_CHARS[(unsigned char) after_char])) {
+      after_char = 10;
+    }
+  } else {
+    len = cmark_utf8proc_iterate(parser->input.data + parser->pos,
+                                 parser->input.len - parser->pos, &after_char);
+    if (len == -1) {
+      after_char = 10;
+    }
   }
 
   *punct_before = cmark_utf8proc_is_punctuation(before_char);
@@ -1737,10 +1866,37 @@ int cmark_inline_parser_scan_delimiters(cmark_inline_parser *parser,
   space_before = cmark_utf8proc_is_space(before_char) != 0;
   space_after = cmark_utf8proc_is_space(after_char) != 0;
 
-  *left_flanking = numdelims > 0 && !cmark_utf8proc_is_space(after_char) &&
-                  !(*punct_after && !space_before && !*punct_before);
-  *right_flanking = numdelims > 0 && !cmark_utf8proc_is_space(before_char) &&
-                  !(*punct_before && !space_after && !*punct_after);
+  if (space_before || space_after) {
+    *left_flanking = numdelims > 0 && !space_after;
+    *right_flanking = numdelims > 0 && !space_before;
+    return numdelims;
+  }
+
+  if (cjk) {
+    *left_flanking = numdelims > 0 && !space_after &&
+                    (!cmark_utf8proc_is_non_cjk_punctuation_character(after_char) ||
+                     space_before ||
+                     cmark_utf8proc_is_non_cjk_punctuation_character(before_char) ||
+                     cmark_utf8proc_is_cjk_character(before_char) ||
+                     cmark_utf8proc_is_ideographic_variation_selector(before_char) ||
+                     (cmark_utf8proc_is_non_emoji_general_use_variation_selector(before_char) &&
+                      (cmark_utf8proc_is_cjk_character(before_before_char) ||
+                       cmark_utf8proc_is_non_cjk_punctuation_character(before_before_char))));
+
+    *right_flanking = numdelims > 0 && !space_before &&
+                     (!(cmark_utf8proc_is_non_cjk_punctuation_character(before_char) ||
+                        (cmark_utf8proc_is_non_emoji_general_use_variation_selector(before_char) &&
+                         cmark_utf8proc_is_non_cjk_punctuation_character(before_before_char) &&
+                         !is_cjk_ambiguous_punctuation_sequence(before_before_char, before_char))) ||
+                      space_after ||
+                      cmark_utf8proc_is_non_cjk_punctuation_character(after_char) ||
+                      cmark_utf8proc_is_cjk_character(after_char));
+  } else {
+    *left_flanking = numdelims > 0 && !space_after &&
+                    !(*punct_after && !space_before && !*punct_before);
+    *right_flanking = numdelims > 0 && !space_before &&
+                    !(*punct_before && !space_after && !*punct_after);
+  }
 
   return numdelims;
 }

@@ -50,6 +50,8 @@ struct cmark_parser {
   cmark_llist *syntax_extensions;
   cmark_llist *inline_syntax_extensions;
   cmark_ispunct_func backslash_ispunct;
+  /* set to true when the cjk_friendly_emphasis extension is attached */
+  bool cjk_friendly_emphasis;
 };
 
 #ifdef __cplusplus

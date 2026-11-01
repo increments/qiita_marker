@@ -108,6 +108,10 @@ int cmark_parser_attach_syntax_extension(cmark_parser *parser,
       parser->mem, parser->inline_syntax_extensions, extension);
   }
 
+  if (extension->cjk_friendly_emphasis) {
+    parser->cjk_friendly_emphasis = true;
+  }
+
   return 1;
 }
 
@@ -124,6 +128,7 @@ static void cmark_parser_reset(cmark_parser *parser) {
   cmark_llist *saved_inline_exts = parser->inline_syntax_extensions;
   int saved_options = parser->options;
   cmark_mem *saved_mem = parser->mem;
+  bool saved_cjk_friendly_emphasis = parser->cjk_friendly_emphasis;
 
   cmark_parser_dispose(parser);
 
@@ -142,6 +147,7 @@ static void cmark_parser_reset(cmark_parser *parser) {
   parser->syntax_extensions = saved_exts;
   parser->inline_syntax_extensions = saved_inline_exts;
   parser->options = saved_options;
+  parser->cjk_friendly_emphasis = saved_cjk_friendly_emphasis;
 }
 
 cmark_parser *cmark_parser_new_with_mem(int options, cmark_mem *mem) {

@@ -1,3 +1,4 @@
+*.o
 *.so
 *.rbc
 *.bundle
@@ -41,5 +42,7 @@ actual.txt
 test.txt
 test/progit
 test/benchinput.md
+
+ext/qiita_marker/Makefile
 
 .vscode

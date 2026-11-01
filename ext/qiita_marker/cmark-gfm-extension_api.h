@@ -1,6 +1,8 @@
 #ifndef CMARK_GFM_EXTENSION_API_H
 #define CMARK_GFM_EXTENSION_API_H
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -375,6 +377,12 @@ void cmark_syntax_extension_set_html_filter_func(cmark_syntax_extension *extensi
 CMARK_GFM_EXPORT
 void cmark_syntax_extension_set_commonmark_escape_func(cmark_syntax_extension *extension,
                                                        cmark_commonmark_escape_func func);
+
+/** Enable CJK-friendly emphasis rules for this extension.
+ */
+CMARK_GFM_EXPORT
+void cmark_syntax_extension_set_cjk_friendly_emphasis(cmark_syntax_extension *extension,
+                                                      bool cjk_friendly_emphasis);
 
 /** See the documentation for 'cmark_syntax_extension'
  */

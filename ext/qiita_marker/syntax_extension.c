@@ -147,3 +147,8 @@ void cmark_syntax_extension_set_commonmark_escape_func(cmark_syntax_extension *e
                                                        cmark_commonmark_escape_func func) {
   extension->commonmark_escape_func = func;
 }
+
+void cmark_syntax_extension_set_cjk_friendly_emphasis(cmark_syntax_extension *extension,
+                                                      bool cjk_friendly_emphasis) {
+  extension->cjk_friendly_emphasis = cjk_friendly_emphasis;
+}
