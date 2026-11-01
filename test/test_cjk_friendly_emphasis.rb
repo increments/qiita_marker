@@ -137,7 +137,106 @@ class TestCjkFriendlyEmphasis < Minitest::Test
     end
   end
 
+  def test_emphasis_adjacent_to_whitespace
+    extension_sets = [[:strikethrough], [:strikethrough, :cjk_friendly_emphasis]]
+    texts = ["!text!", "。本文。", "𰻞"]
+    spaces = [" ", "\t", "\n", "\u00A0", "\u3000"]
+    { "*" => "em", "**" => "strong", "_" => "em", "__" => "strong", "~" => "del", "~~" => "del" }.each do |marker, tag|
+      extension_sets.each do |extensions|
+        texts.each do |text|
+          input = "#{marker}#{text}#{marker}"
+
+          assert_equal "<p><#{tag}>#{text}</#{tag}></p>\n", QiitaMarker.render_html(input, :DEFAULT, extensions), input
+
+          spaces.each do |space|
+            input = "a#{space}#{marker}#{text}#{marker}#{space}z"
+            expected = "<p>a#{space}<#{tag}>#{text}</#{tag}>#{space}z</p>\n"
+
+            assert_equal expected, QiitaMarker.render_html(input, :DEFAULT, extensions), input
+          end
+        end
+      end
+    end
+  end
+
+  def test_emphasis_cannot_open_or_close_toward_whitespace
+    extension_sets = [[:strikethrough], [:strikethrough, :cjk_friendly_emphasis]]
+    spaces = [" ", "\t", "\n", "\u00A0", "\u3000"]
+    ["*", "**", "_", "__", "~", "~~"].each do |marker|
+      extension_sets.each do |extensions|
+        spaces.each do |space|
+          ["a#{marker}#{space}text#{marker}z", "a#{marker}text#{space}#{marker}z", "a #{marker}#{space}z"].each do |input|
+            assert_equal "<p>#{input}</p>\n", QiitaMarker.render_html(input, :DEFAULT, extensions), input
+          end
+        end
+      end
+    end
+  end
+
+  def test_cjk_underscore_depends_only_on_adjacent_punctuation
+    neighbors = { "a" => false, "中" => false, "𰻞" => false, "😀" => false, "!" => true, "。" => true, "）" => true, "”" => true }
+    { "_" => "em", "__" => "strong" }.each do |marker, tag|
+      neighbors.each do |before, punct_before|
+        neighbors.each do |after, punct_after|
+          input = "#{before}#{marker}text#{marker}#{after}"
+          expected = if punct_before && punct_after
+            "<p>#{before}<#{tag}>text</#{tag}>#{after}</p>\n"
+          else
+            "<p>#{input}</p>\n"
+          end
+
+          assert_equal expected, QiitaMarker.render_html(input, :DEFAULT, [:cjk_friendly_emphasis]), input
+        end
+      end
+    end
+  end
+
+  def test_cjk_underscore_uses_punctuation_before_general_use_variation_selector
+    bases = ["!", "。", "”", "𰻞", "a"]
+    punctuation = ["!", "。", "”"]
+    { "_" => "em", "__" => "strong" }.each do |marker, tag|
+      bases.each do |base|
+        (0xFE00..0xFE0F).each do |selector|
+          input = "#{base}#{selector.chr(Encoding::UTF_8)}#{marker}text#{marker}!"
+          expected = if selector <= 0xFE0E && punctuation.include?(base)
+            "<p>#{base}#{selector.chr(Encoding::UTF_8)}<#{tag}>text</#{tag}>!</p>\n"
+          else
+            "<p>#{input}</p>\n"
+          end
+
+          assert_equal expected, QiitaMarker.render_html(input, :DEFAULT, [:cjk_friendly_emphasis]), input
+        end
+      end
+    end
+  end
+
+  def test_asterisks_and_strikethrough_use_cjk_flanking_without_whitespace
+    { "*" => "em", "**" => "strong", "~" => "del", "~~" => "del" }.each do |marker, tag|
+      input = "中#{marker}(text)#{marker}中"
+
+      assert_equal "<p>中<#{tag}>(text)</#{tag}>中</p>\n", QiitaMarker.render_html(input, :DEFAULT, [:strikethrough, :cjk_friendly_emphasis]), input
+    end
+  end
+
   # Strikethrough tests with CJK-friendly emphasis
+  def test_single_and_double_tilde_allow_intraword_strikethrough
+    extension_sets = [[:strikethrough], [:strikethrough, :cjk_friendly_emphasis]]
+    ["~", "~~"].each do |marker|
+      extension_sets.each do |extensions|
+        input = "a#{marker}text#{marker}z a_text_z"
+
+        assert_equal "<p>a<del>text</del>z a_text_z</p>\n", QiitaMarker.render_html(input, :DEFAULT, extensions), input
+      end
+    end
+  end
+
+  def test_cjk_strikethrough_double_tilde_option_disables_single_tildes
+    input = "中~(text)~中 中~~(text)~~中"
+    result = QiitaMarker.render_html(input, :STRIKETHROUGH_DOUBLE_TILDE, [:strikethrough, :cjk_friendly_emphasis])
+
+    assert_equal "<p>中~(text)~中 中<del>(text)</del>中</p>\n", result
+  end
+
   def test_strikethrough_cjk_basic
     result = QiitaMarker.render_html("これは~~取消~~です", :DEFAULT, [:strikethrough, :cjk_friendly_emphasis])
 
